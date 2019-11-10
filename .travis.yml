@@ -8,6 +8,4 @@ services:
 before_script: pip install docker-compose
 
 script:
-  - echo $(ls)
-  - cd app
-  - echo $(ls)
+  - cd app && echo $(ls)
