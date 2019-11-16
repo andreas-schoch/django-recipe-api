@@ -22,3 +22,4 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Tag)  # no need to specify admin second param, it falls back to default one
