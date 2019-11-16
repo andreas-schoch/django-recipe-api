@@ -1,10 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
-
 from rest_framework import status
 from rest_framework.test import APIClient
-
 from core.models import Tag
 from recipe.serializers import TagSerializer
 
@@ -61,3 +59,18 @@ class PrivateTagsApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)  # should only return a single tag of authorized user
         self.assertEqual(res.data[0]['name'], my_tag.name)
+
+    def test_create_tag_successful(self):
+        """Test creating a new tag"""
+        payload = {'name': 'newtag'}
+        self.client.post(TAGS_URL, payload)
+
+        exists = Tag.objects.filter(user=self.user, name=payload['name']).exists()
+        self.assertTrue(exists)
+
+    def test_create_tag_invalid(self):
+        """Test creating a tag with invalid name"""
+        payload = {'name': ''}
+        res = self.client.post(TAGS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
