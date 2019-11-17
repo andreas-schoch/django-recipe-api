@@ -54,17 +54,17 @@ class PrivateIngredientsApiTests(TestCase):
         self.assertEqual(len(res.data), 1)  # should only return a single ingredient of authorized user
         self.assertEqual(res.data[0]['name'], my_ingredient.name)
 
-    # def test_create_tag_successful(self):
-    #     """Test creating a new tag"""
-    #     payload = {'name': 'newtag'}
-    #     self.client.post(INGREDIENTS_URL, payload)
-    #
-    #     exists = Ingredient.objects.filter(user=self.user, name=payload['name']).exists()
-    #     self.assertTrue(exists)
-    #
-    # def test_create_tag_invalid(self):
-    #     """Test creating a tag with invalid name"""
-    #     payload = {'name': ''}
-    #     res = self.client.post(INGREDIENTS_URL, payload)
-    #
-    #     self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_create_ingredient_successful(self):
+        """Test creating a new Ingredient"""
+        payload = {'name': 'newingredient'}
+        self.client.post(INGREDIENTS_URL, payload)
+
+        exists = Ingredient.objects.filter(user=self.user, name=payload['name']).exists()
+        self.assertTrue(exists)
+
+    def test_create_ingredient_invalid(self):
+        """Test creating a Ingredient with invalid name"""
+        payload = {'name': ''}
+        res = self.client.post(INGREDIENTS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
