@@ -95,3 +95,102 @@ class PrivateIngredientsApiTests(TestCase):
 
         serializer = RecipeDetailSerializer(recipe)
         self.assertEqual(res.data, serializer.data)
+
+    def test_creating_basic_recipe(self):
+        """Test creating recipe"""
+        payload = {
+            'title': 'Chicken Wings',
+            'time_minutes': 20,
+            'price': 6
+        }
+        res = self.client.post(RECIPES_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipe = Recipe.objects.get(id=res.data['id'])
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(recipe, key))
+
+    def test_create_recipe_with_tags(self):
+        """Test creating a recipe with tags"""
+        tag1 = sample_tag(user=self.user, name='tagname1')
+        tag2 = sample_tag(user=self.user, name='tagname2')
+
+        payload = {
+            'title': 'Cheesecake',
+            'time_minutes': 20,
+            'price': 6,
+            'tags': [tag1.id, tag2.id]
+        }
+
+        res = self.client.post(RECIPES_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipe = Recipe.objects.get(id=res.data['id'])
+
+        tags = recipe.tags.all()  # because tags are a many2many relation
+
+        self.assertEqual(tags.count(), 2)
+        self.assertIn(tag1, tags)
+        self.assertIn(tag2, tags)
+
+    def test_create_recipe_with_ingredients(self):
+        """Test creating a recipe with ingredients"""
+        ingredient1 = sample_ingredient(user=self.user, name='ingredientname1')
+        ingredient2 = sample_ingredient(user=self.user, name='ingredientname2')
+
+        payload = {
+            'title': 'Cheesecake',
+            'time_minutes': 20,
+            'price': 6,
+            'ingredients': [ingredient1.id, ingredient2.id]
+        }
+
+        res = self.client.post(RECIPES_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipe = Recipe.objects.get(id=res.data['id'])
+
+        ingredients = recipe.ingredients.all()  # because ingredients are a many2many relation
+
+        self.assertEqual(ingredients.count(), 2)
+        self.assertIn(ingredient1, ingredients)
+        self.assertIn(ingredient2, ingredients)
+
+    def test_partial_update_recipe(self):
+        """Test updating a recipe with PATCH"""
+        recipe = sample_recipe(user=self.user)
+        recipe.tags.add(sample_tag(self.user))
+        new_tag = sample_tag(user=self.user, name='Whatever')
+
+        payload = {'title': 'Chicken Curry', 'tags': [new_tag.id]}
+
+        url = detail_url(recipe.id)
+        self.client.patch(url, payload)
+
+        recipe.refresh_from_db()  # when changing an object, you have to call this function to sync
+        self.assertEqual(recipe.title, payload['title'])
+        tags = recipe.tags.all()
+        self.assertEqual(len(tags), 1)
+        self.assertIn(new_tag, tags)
+
+    def test_full_update_recipe(self):
+        """Test updating a recipe with PUT"""
+        recipe = sample_recipe(user=self.user)
+        recipe.tags.add(sample_tag(self.user))
+        new_tag = sample_tag(user=self.user, name='Whatever')
+
+        payload = {
+            'title': 'Chicken Curry',
+            'time_minutes': 50,
+            'price': 12
+        }
+
+        url = detail_url(recipe.id)
+        self.client.put(url, payload)
+
+        recipe.refresh_from_db()  # when changing an object, you have to call this function to sync
+        self.assertEqual(recipe.title, payload['title'])
+        self.assertEqual(recipe.time_minutes, payload['time_minutes'])
+        self.assertEqual(recipe.price, payload['price'])
+        tags = recipe.tags.all()
+        self.assertEqual(len(tags), 0)
