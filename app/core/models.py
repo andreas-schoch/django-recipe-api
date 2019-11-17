@@ -63,7 +63,7 @@ class Recipe(models.Model):
     time_minutes = models.IntegerField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     link = models.CharField(max_length=255, blank=True)
-    ingredients = models.ManyToManyField('Ingredient')
+    ingredients = models.ManyToManyField('Ingredient')  # dependency order doesn't matter if wrapped as a string
     tags = models.ManyToManyField('Tag')
 
     def __str__(self):

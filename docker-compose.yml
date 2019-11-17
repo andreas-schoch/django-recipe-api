@@ -26,3 +26,5 @@ services:
       - POSTGRES_DB=app
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password123  # overwritten for prod
+    ports:
+      - "5432:5432"
