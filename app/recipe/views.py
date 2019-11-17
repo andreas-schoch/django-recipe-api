@@ -37,10 +37,22 @@ class IngredientViewSet(BaseRecipeAttrViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Manage recipes in the database"""
     queryset = Recipe.objects.all()
-    serializer_class = serializers.RecipeSerializer
+    serializer_class = serializers.RecipeSerializer  # normal serializer class, changed for certain actions
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         """Retrieve the recipes for authenticated user"""
         return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """create a new recipe"""
+        serializer.save(user=self.request.user)  # inject user =  authenticated user, as it's not send in payload
+
+    def get_serializer_class(self):
+        """Return appropriate serializer class for different kind of requests"""
+        if self.action == 'retrieve':
+            return serializers.RecipeDetailSerializer
+
+        # returns the normal serializer class specified above
+        return self.serializer_class
