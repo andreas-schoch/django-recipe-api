@@ -177,7 +177,7 @@ class PrivateIngredientsApiTests(TestCase):
         """Test updating a recipe with PUT"""
         recipe = sample_recipe(user=self.user)
         recipe.tags.add(sample_tag(self.user))
-        new_tag = sample_tag(user=self.user, name='Whatever')
+        sample_tag(user=self.user, name='Whatever')
 
         payload = {
             'title': 'Chicken Curry',

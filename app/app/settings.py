@@ -133,8 +133,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
 
+# url is kinda of like a mapping to the root, it's a prefix used to access the root dirs via browser
+# https://127.0.0.1:8000/static/<root_dirs>
+STATIC_URL = '/static/'  # files that won't change like css, js or whatever
+MEDIA_URL = '/media/'  # user uploaded files
+
+# the root is the actual location of the files on the system. The url is a mapping to be used from the web
+MEDIA_ROOT = '/vol/web/media'
+STATIC_ROOT = '/vol/web/static'
 
 # set the custom user model
 AUTH_USER_MODEL = 'core.User'
